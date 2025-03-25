@@ -1,43 +1,73 @@
-import React from "react";
+import { Component } from "react";
+import { nanoid } from "nanoid";
+import { Book } from "./Book/Book";
 
-export function App() {
-  const myName = "влад";
-
-  const favoriteSite = { 
-    name: "YouTube", 
-    url: "https://www.youtube.com/" 
+export class App extends Component {
+  state = {
+    contacts: [
+      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' }
+    ],
+    name: '',
+    number: ''
   };
 
-  const num1 = 7;
-  const num2 = 5;
+  handleChange = (e) => {
+    this.setState({ [e.target.name]: e.target.value });
+  };
 
-  const colors = ["Червоний", "Синій", "Зелений"];
+  addContact = () => {
+    const { name, number, contacts } = this.state;
 
-  return (
-    <div>
-      <h1>{myName}</h1>
+    const isExisting = contacts.some(contact => contact.name === name);
+    if (isExisting) {
+      alert("Name already exists");
+      return;
+    }
 
-      <p>Ласкаво просимо до нашого сайту!</p>
+    const newContact = {
+      id: nanoid(),
+      name,
+      number
+    };
 
-      <img
-        src="https://en.wikipedia.org/wiki/File:Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg"
-        alt="Гори"
-      />
+    this.setState((prevState) => ({
+      contacts: [...prevState.contacts, newContact],
+      name: '',
+      number: ''
+    }));
+  };
 
-      <p>
-        Моє улюблене посилання:{" "}
-        <a href={favoriteSite.url} target="_blank" rel="noopener noreferrer">
-          {favoriteSite.name}
-        </a>
-      </p>
+  deleteContact = (id) => {
+    this.setState((prevState) => ({
+      contacts: prevState.contacts.filter(contact => contact.id !== id)
+    }));
+  };
 
-      <p>Сума чисел {num1} і {num2} дорівнює {num1 + num2}.</p>
+  render() {
+    return (
+      <div>
+        <h1>phoneBook</h1>
+        
+        <Book 
+          name={this.state.name} 
+          number={this.state.number} 
+          onChange={this.handleChange}
+        />
 
-      <ul>
-        {colors.map((color, index) => (
-          <li key={index}>{color}</li>
-        ))}
-      </ul>
-    </div>
-  );
+        <button onClick={this.addContact}>Add contact</button>
+
+        <ul>
+          {this.state.contacts.map(({ id, name, number }) => (
+            <li key={id}>
+              {name}: {number}
+              <button onClick={() => this.deleteContact(id)}>Delete</button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
 }
